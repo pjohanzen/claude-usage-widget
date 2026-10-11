@@ -1,0 +1,51 @@
+name: Windows build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]" pyinstaller
+
+      - name: Tests, lint, and type checks
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python -m pytest -q
+          python -m ruff check src tests packaging
+          python -m mypy
+
+      - name: Build portable folder with PyInstaller
+        run: >
+          python -m PyInstaller --noconfirm --onedir --windowed --name ClaudeUsageWidget
+          --paths src --distpath build/dist --workpath build/pyinstaller --specpath build
+          packaging/launcher.py
+
+      - name: Smoke test the packaged executable
+        shell: pwsh
+        run: |
+          $exe = Resolve-Path "build/dist/ClaudeUsageWidget/ClaudeUsageWidget.exe"
+          $proc = Start-Process -FilePath $exe -ArgumentList "--version" -Wait -PassThru
+          if ($proc.ExitCode -ne 0) { throw "Packaged app exited with code $($proc.ExitCode)" }
+
+      - name: Zip the portable build
+        shell: pwsh
+        run: Compress-Archive -Path build/dist/ClaudeUsageWidget -DestinationPath build/ClaudeUsageWidget-windows-portable.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ClaudeUsageWidget-windows-portable
+          path: build/ClaudeUsageWidget-windows-portable.zip

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Usage Widget
+Comment=Compact desktop widget for Claude usage
+Exec=claude-usage-widget
+Icon=claude-usage-widget
+Terminal=false
+Categories=Utility;

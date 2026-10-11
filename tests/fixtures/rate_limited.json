@@ -1,0 +1,4 @@
+{
+  "simulate": "rate_limited",
+  "retry_after_s": 120
+}

@@ -1,0 +1,5 @@
+{
+  "updated_at": "2024-01-01T00:00:00Z",
+  "session": {"used_percent": 10, "resets_at": "2024-01-01T05:00:00Z"},
+  "weekly": {"used_percent": 20, "resets_at": "2024-01-05T00:00:00Z"}
+}
